@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-  <title>reveal.js</title>
+  <title>Implementing Domain-Driven Design in Django</title>
 
   <link rel="stylesheet" href="dist/reset.css">
   <link rel="stylesheet" href="dist/reveal.css">
@@ -15,7 +15,7 @@
     :root {
       --r-background-color: #111;
       --r-main-font: Open Sans, sans-serif;
-      --r-main-font-size: 24px;
+      --r-main-font-size: 28px;
       --r-main-color: #eee;
       --r-block-margin: 20px;
       --r-heading-margin: 20px 0;
@@ -43,6 +43,10 @@
       vertical-align: middle;
     }
 
+    .reveal p > img {
+      margin: 0;
+    }
+
     .reveal {
       text-shadow: #000 0 0 .5em;
     }
@@ -57,9 +61,8 @@
       margin-bottom: 0;
     }
 
-    .reveal .alternate .slide-background-content {
-      background-image: url('djangocon_white.jpg') !important;
-      opacity: 1 !important;
+    .reveal p + ul {
+      margin-top: 0;
     }
 
     .reveal .alternate h1,
@@ -70,15 +73,10 @@
     .reveal .alternate h6 {
       color: #033369;
     }
-
-
   </style>
 
   <!-- Theme used for syntax highlighted code -->
-<!--  <link rel="stylesheet" href="plugin/highlight/monokai.css">-->
   <link rel="stylesheet" href="stackoverflow-dark.css">
-<!--  <link rel="stylesheet" href="sunburst.css">-->
-<!--  <link rel="stylesheet" href="rainbow.css">-->
 </head>
 <body>
 <div class="reveal">
@@ -89,9 +87,8 @@
       data-background-image="homepage_xl.png"
       data-background-opacity="0.8"
     >
-      <textarea data-template>
-<!-- .slide: class="alternate" -->
-
+  <script type="text/template">
+<!-- .slide: class="alternate"  data-background-image="djangocon_white.jpg" data-background-opacity="1" -->
 
 # Implementing Domain-Driven Design in Django
 
@@ -134,7 +131,7 @@ Notes:
 - all open-source
 
 ---
-<!-- .slide: class="alternate" -->
+<!-- .slide: class="alternate"  data-background-image="djangocon_white.jpg" data-background-opacity="1" -->
 
 # The OSIS project
 
@@ -173,17 +170,17 @@ It's "almost" open-source, main project has recently been taken out of public
 Security-oriented architecture
 
 ```text
-┌──────────────────────┐                  ┌────────────────────────┐
-│      Backoffice      │  API generated   │    Frontoffice         │
-├──────────────────────┤     in Python    ├────────────────────────┤
-│                      │                  │                        │
-│  Internal portal     │                  │  External portal       │
-│                      │◄────────────────►│                        │
-│                      │                  │                        │
-│ > Managers           │                  │ > Students             │
-│ > Administrators     │                  │ > Tutors               │
-│                      │                  │                        │
-└──────────────────────┘                  └────────────────────────┘
+			┌──────────────────────┐                  ┌────────────────────────┐
+			│      Backoffice      │  API generated   │    Frontoffice         │
+			├──────────────────────┤     in Python    ├────────────────────────┤
+			│                      │                  │                        │
+			│  Internal portal     │                  │  External portal       │
+			│                      │◄────────────────►│                        │
+			│                      │                  │                        │
+			│ > Managers           │                  │ > Students             │
+			│ > Administrators     │                  │ > Tutors               │
+			│                      │                  │                        │
+			└──────────────────────┘                  └────────────────────────┘
 ```
 
 On the Django side:
@@ -199,7 +196,7 @@ Notes:
 - only stores basic data in database, historic decision, could be replaced by a framework-based frontend later
 
 ---
-<!-- .slide: class="alternate" -->
+<!-- .slide: class="alternate"  data-background-image="djangocon_white.jpg" data-background-opacity="1" -->
 
 # What is DDD, why and when?
 
@@ -233,7 +230,7 @@ So I'll be showing some code that is in French (which I will translate as much a
 
 ## But why so much pain?
 
-> Django is a model-driven (or data-driven ?) framework !
+> Django is a model-driven (or data-driven ?) framework !
 
 - Yes, but for **complex processes**, the code can look like spaghetti
 - When your model changes, you **risk an alteration** of the process
@@ -268,6 +265,8 @@ So I'll be showing some code that is in French (which I will translate as much a
 - Short time-to-market or Proof-of-Concept
 - Your dev team is too junior
 
+---
+
 ### Can I use DDD in my existing project?
 
 Yes
@@ -279,7 +278,7 @@ Yes
 
 ---
 
-<!-- .slide: class="alternate" -->
+<!-- .slide: class="alternate"  data-background-image="djangocon_white.jpg" data-background-opacity="1" -->
 
 # Common patterns
 
@@ -314,25 +313,30 @@ Yes
 
 ## Shared kernel
 
-> A shared kernel can be created for objects that are used everywhere
+- A shared kernel can be created for objects that are used everywhere
+- It can be present at multiple levels of the project
+- It prevents duplication
+- Beware of it inflating if you put too much in it!
 
 *Common examples : user info, addresses, notifications*
+
+---
 
 ## Onion architecture
 
 ```text [|8|6|4|2]
-                ┌──────────────────────────┐
-                │ UI / Presentation layer  │
-                │ ┌──────────────────────┐ │
-                │ │    Service layer     │ │
-                │ │ ┌──────────────────┐ │ │
-                │ │ │ Repository layer │ │ │
-                │ │ │ ┌──────────────┐ │ │ │
-                │ │ │ │ Domain layer │ │ │ │
-                │ │ │ └──────────────┘ │ │ │
-                │ │ └──────────────────┘ │ │
-                │ └──────────────────────┘ │
-                └──────────────────────────┘
+                            ┌──────────────────────────┐
+                            │ UI / Presentation layer  │
+                            │ ┌──────────────────────┐ │
+                            │ │    Service layer     │ │
+                            │ │ ┌──────────────────┐ │ │
+                            │ │ │ Repository layer │ │ │
+                            │ │ │ ┌──────────────┐ │ │ │
+                            │ │ │ │ Domain layer │ │ │ │
+                            │ │ │ └──────────────┘ │ │ │
+                            │ │ └──────────────────┘ │ │
+                            │ └──────────────────────┘ │
+                            └──────────────────────────┘
 ```
 This is OSIS' take, some DDD architectures use *hexagonal* or *clean* architecture
 
@@ -363,52 +367,52 @@ ddd
 ├── formation_continue (a continuing education process)
 │   └── ...
 └── doctorat (a doctoral process)
-├── builder
-├── domain
-│   ├── model
-│   ├── service
-│   └── validator
-├── dtos
-├── epreuve_confirmation
-│   ├── builder
-│   ├── domain
-│   │   ├── model
-│   │   └── service
-│   ├── dtos
-│   ├── repository
-│   ├── test
-│   │   ├── factory
-│   │   └── use_case
-│   │       ├── read
-│   │       └── write
-│   ├── use_case
-│   │   ├── read
-│   │   └── write
-│   └── validators
-├── formation
-│   ├── builder
-│   ├── domain
-│   │   ├── model
-│   │   ├── service
-│   │   └── validator
-│   ├── dtos
-│   ├── repository
-│   ├── test
-│   │   ├── factory
-│   │   └── use_case
-│   │       ├── read
-│   │       └── write
-│   └── use_case
-│       ├── read
-│       └── write
-├── repository
-├── test
-│   ├── factory
-│   └── use_case
-│       └── read
-└── use_case
-    ├── read
-    └── write
+    ├── builder
+    ├── domain
+    │   ├── model
+    │   ├── service
+    │   └── validator
+    ├── dtos
+    ├── epreuve_confirmation
+    │   ├── builder
+    │   ├── domain
+    │   │   ├── model
+    │   │   └── service
+    │   ├── dtos
+    │   ├── repository
+    │   ├── test
+    │   │   ├── factory
+    │   │   └── use_case
+    │   │       ├── read
+    │   │       └── write
+    │   ├── use_case
+    │   │   ├── read
+    │   │   └── write
+    │   └── validators
+    ├── formation
+    │   ├── builder
+    │   ├── domain
+    │   │   ├── model
+    │   │   ├── service
+    │   │   └── validator
+    │   ├── dtos
+    │   ├── repository
+    │   ├── test
+    │   │   ├── factory
+    │   │   └── use_case
+    │   │       ├── read
+    │   │       └── write
+    │   └── use_case
+    │       ├── read
+    │       └── write
+    ├── repository
+    ├── test
+    │   ├── factory
+    │   └── use_case
+    │       └── read
+    └── use_case
+        ├── read
+        └── write
 infrastructure
 ├── admission
 │   ├── preparation
@@ -422,23 +426,23 @@ infrastructure
 │           └── in_memory
 ├── formation_continue
 └── doctorat
-├── domain
-│   └── service
-│       └── in_memory
-├── epreuve_confirmation
-│   ├── domain
-│   │   └── service
-│   │       └── in_memory
-│   └── repository
-│       └── in_memory
-├── formation
-│   ├── domain
-│   │   └── service
-│   │       └── in_memory
-│   └── repository
-│       └── in_memory
-└── repository
-    └── in_memory
+    ├── domain
+    │   └── service
+    │       └── in_memory
+    ├── epreuve_confirmation
+    │   ├── domain
+    │   │   └── service
+    │   │       └── in_memory
+    │   └── repository
+    │       └── in_memory
+    ├── formation
+    │   ├── domain
+    │   │   └── service
+    │   │       └── in_memory
+    │   └── repository
+    │       └── in_memory
+    └── repository
+        └── in_memory
 ```
 
 Notes:
@@ -459,10 +463,13 @@ Notes:
 
 ![](https://media.giphy.com/media/xULW8MYvpNOfMXfDH2/giphy.gif)
 
+---
+
 ## Vocabulary
 
 - **Use case** : some action, a query (read) or command (write) made by someone
-- **Repository** : your way to the data
+- **Aggregate** : a root entity, entry point to manipulate data, masking other domain entities
+- **Repository** : your way to the data, loading or saving aggregates, or fetching DTO
 - **DTO** : Data-Transfer-Object, a dumb data class used to I/O from context
 - **Domain service** : useful when dealing with multiple or complex things
 - **Validator** : prevents manipulating a wrong state in your domain
@@ -484,10 +491,16 @@ Get everyone in the business around a table to state on what should the applicat
 
 **Event modeling**
 
-Basically the same, but closer to the user interface
+Refine previous work, adding concepts of user interface and actors
 
 
 <img class="r-stretch" src="event_modeling.png">
+
+---
+<!-- .slide: class="alternate"  data-background-image="djangocon_white.jpg" data-background-opacity="1" -->
+
+
+# Our take
 
 ---
 
@@ -496,101 +509,107 @@ Basically the same, but closer to the user interface
 - Use python 3.7+ for **dataclasses**
 - `attrs` is a nice library for default attribute factories, frozen and slotted classes
 - **Using typing** make it easier, `mypy` (with `django-stubs`) is your friend after that
-- **Avoid using any of Django** in `ddd` directory (apart maybe gettext_lazy, SimpleTestCase and timezone)
+- **Avoid using any of Django** in `ddd` directory (apart maybe gettext_lazy and timezone)
 
-### Now some code !
+**Now some code !**
 
 ---
 
 ### An example of an aggregate
 
-- it's a root entity (could be a single model in Django, or multiple, or a part)
-- it has an identity (usually PK, may be an uuid)
-- it has a state (data attributes) and some behaviors (methods)
+- it's a **root entity** (could be a single model in Django, or multiple, or a part)
+- it has an **identity** (usually PK, may be an uuid)
+- it has a **state** (data attributes) and some **behaviors** (methods encapsulating the business)
 - that may contain complex data (through ValueObjects)
-- some behavior can ensure its state is valid before modifying it
-- it can be loaded and saved through a repository
+- some behavior can ensure its **state is valid** before modifying it
+- it can be loaded and saved **through a repository**
+
+---
 
 ```python [|1-3|7|9-11|13-25|28-31|]
 @attr.dataclass(frozen=True, slots=True)
 class EpreuveConfirmationIdentity(interface.EntityIdentity):
-uuid: str
+    uuid: str
 
 @attr.dataclass(slots=True, hash=False, eq=False)
 class EpreuveConfirmation(interface.RootEntity):
-entity_id: EpreuveConfirmationIdentity
+    entity_id: EpreuveConfirmationIdentity
 
-doctorat_id: DoctoratIdentity
-date_limite: datetime.date
-rapport_recherche: List[str] = attr.Factory(list)
+    doctorat_id: DoctoratIdentity
+    date_limite: datetime.date
+    rapport_recherche: List[str] = attr.Factory(list)
 
-demande_prolongation: Optional['DemandeProlongation'] = None
+    demande_prolongation: Optional['DemandeProlongation'] = None
 
-def faire_demande_prolongation(
-    self,
-    nouvelle_echeance: datetime.date,
-    justification_succincte: str,
-    lettre_justification: List[str],
-):
-    self.demande_prolongation = DemandeProlongation(
-        nouvelle_echeance=nouvelle_echeance,
-        justification_succincte=justification_succincte,
-        lettre_justification=lettre_justification,
-    )
+    def faire_demande_prolongation(
+        self,
+        nouvelle_echeance: datetime.date,
+        justification_succincte: str,
+        lettre_justification: List[str],
+    ):
+        self.demande_prolongation = DemandeProlongation(
+            nouvelle_echeance=nouvelle_echeance,
+            justification_succincte=justification_succincte,
+            lettre_justification=lettre_justification,
+        )
 
-def verifier_pour_encodage_decision(self):
-    EncodageDecisionValidatorList(
-        date=self.date,
-        proces_verbal_ca=self.proces_verbal_ca,
-    ).validate()
-    self.attestation_reussite = []
+    def verifier_pour_encodage_decision(self):
+        EncodageDecisionValidatorList(
+            date=self.date,
+            proces_verbal_ca=self.proces_verbal_ca,
+        ).validate()
+        self.attestation_reussite = []
 
 
-def completer_par_promoteur(
-    self,
-    proces_verbal_ca: List[str],
-    avis_renouvellement_mandat_recherche: List[str],
-):
-    self.proces_verbal_ca = proces_verbal_ca
-    self.avis_renouvellement_mandat_recherche = avis_renouvellement_mandat_recherche
+    def completer_par_promoteur(
+        self,
+        proces_verbal_ca: List[str],
+        avis_renouvellement_mandat_recherche: List[str],
+    ):
+        self.proces_verbal_ca = proces_verbal_ca
+        self.avis_renouvellement_mandat_recherche = avis_renouvellement_mandat_recherche
 
 ```
 ---
 
 ## An example of repository
 
-- Based on an interface, swappable, can have an in-memory version for unit tests, or even a SQLAlchemy version to drop Django ORM
+- Based on an **interface**, hence swappable, can have an in-memory version for unit tests, or even a SQLAlchemy version to drop Django ORM
 - It should have 3 default methods : `get`, `save` (update or create), and `delete`, but can have other methods (search, get_by_X)
 - Can return an aggregate (or a collection of) or DTOs
 
-```python [|4|19|31]
+---
+
+```python [|4|19|28]
 class IEpreuveConfirmationRepository(interface.AbstractRepository):
-@classmethod
-@abc.abstractmethod
-def get(cls, entity_id: 'EpreuveConfirmationIdentity') -> 'EpreuveConfirmation':
-    raise NotImplementedError
+    @classmethod
+    @abc.abstractmethod
+    def get(cls, entity_id: 'EpreuveConfirmationIdentity') -> 'EpreuveConfirmation':
+        pass
 
-@classmethod
-@abc.abstractmethod
-def get_dto(cls, entity_id: 'EpreuveConfirmationIdentity') -> 'EpreuveConfirmationDTO':
-    raise NotImplementedError
+    @classmethod
+    @abc.abstractmethod
+    def get_dto(cls, entity_id: 'EpreuveConfirmationIdentity') -> 'EpreuveConfirmationDTO':
+        pass
 
-@classmethod
-@abc.abstractmethod
-def save(cls, entity: 'EpreuveConfirmation') -> 'EpreuveConfirmationIdentity':  # type: ignore[override]
-    raise NotImplementedError
+    @classmethod
+    @abc.abstractmethod
+    def save(cls, entity: 'EpreuveConfirmation') -> 'EpreuveConfirmationIdentity':
+        pass
 
-@classmethod
-def search(  # type: ignore[override]
-    cls,
-    entity_ids: Optional[List['EpreuveConfirmationIdentity']] = None,
-    **kwargs,
-) -> List[EpreuveConfirmation]:
-    raise NotImplementedError
+    @classmethod
+    @abc.abstractmethod
+    def search(
+        cls,
+        entity_ids: Optional[List['EpreuveConfirmationIdentity']] = None,
+        **kwargs,
+    ) -> List[EpreuveConfirmation]:
+        pass
 
-@classmethod
-def delete(cls, entity_id: 'EpreuveConfirmationIdentity', **kwargs) -> None:  # type: ignore[override]
-    raise NotImplementedError
+    @classmethod
+    @abc.abstractmethod
+    def delete(cls, entity_id: 'EpreuveConfirmationIdentity', **kwargs) -> None:
+        pass
 ```
 
 
@@ -606,64 +625,64 @@ Mapping your model(s) to the aggregate and ValueObject
 
 ```python [|5,9-24|43-57]
 class EpreuveConfirmationRepository(IEpreuveConfirmationRepository):
-@classmethod
-def get(cls, entity_id: 'EpreuveConfirmationIdentity') -> 'EpreuveConfirmation':
-    try:
-        confirmation_paper = ConfirmationPaper.objects.select_related('admission').get(uuid=entity_id.uuid)
-    except ConfirmationPaper.DoesNotExist:
-        raise EpreuveConfirmationNonTrouveeException
+    @classmethod
+    def get(cls, entity_id: 'EpreuveConfirmationIdentity') -> 'EpreuveConfirmation':
+        try:
+            confirmation_paper = ConfirmationPaper.objects.select_related('admission').get(uuid=entity_id.uuid)
+        except ConfirmationPaper.DoesNotExist:
+            raise EpreuveConfirmationNonTrouveeException
 
-    return EpreuveConfirmation(
-        entity_id=EpreuveConfirmationIdentityBuilder.build_from_uuid(str(confirmation_paper.uuid)),
-        doctorat_id=DoctoratIdentityBuilder.build_from_uuid(confirmation_paper.admission.uuid),
-        date_limite=confirmation_paper.confirmation_deadline,
-        date=confirmation_paper.confirmation_date,
-        rapport_recherche=confirmation_paper.research_report,
-        demande_prolongation=DemandeProlongation(
-            nouvelle_echeance=confirmation_paper.extended_deadline,
-            justification_succincte=confirmation_paper.brief_justification,
-            lettre_justification=confirmation_paper.justification_letter,
-            avis_cdd=confirmation_paper.cdd_opinion,
+        return EpreuveConfirmation(
+            entity_id=EpreuveConfirmationIdentityBuilder.build_from_uuid(str(confirmation_paper.uuid)),
+            doctorat_id=DoctoratIdentityBuilder.build_from_uuid(confirmation_paper.admission.uuid),
+            date_limite=confirmation_paper.confirmation_deadline,
+            date=confirmation_paper.confirmation_date,
+            rapport_recherche=confirmation_paper.research_report,
+            demande_prolongation=DemandeProlongation(
+                nouvelle_echeance=confirmation_paper.extended_deadline,
+                justification_succincte=confirmation_paper.brief_justification,
+                lettre_justification=confirmation_paper.justification_letter,
+                avis_cdd=confirmation_paper.cdd_opinion,
+            )
+            if confirmation_paper.extended_deadline
+            else None,
+            ....
         )
-        if confirmation_paper.extended_deadline
-        else None,
-        ....
-    )
 
-...
+	...
 
-@classmethod
-def save(cls, entity: 'EpreuveConfirmation') -> 'EpreuveConfirmationIdentity':
-    related_admission = DoctorateAdmission.objects.get(uuid=entity.doctorat_id.uuid)
+    @classmethod
+    def save(cls, entity: 'EpreuveConfirmation') -> 'EpreuveConfirmationIdentity':
+        related_admission = DoctorateAdmission.objects.get(uuid=entity.doctorat_id.uuid)
 
-    extended_deadline_params = (
-        {
-            'extended_deadline': entity.demande_prolongation.nouvelle_echeance,
-            'cdd_opinion': entity.demande_prolongation.avis_cdd,
-            'justification_letter': entity.demande_prolongation.lettre_justification,
-            'brief_justification': entity.demande_prolongation.justification_succincte,
-        }
-        if entity.demande_prolongation
-        else {}
-    )
+        extended_deadline_params = (
+            {
+                'extended_deadline': entity.demande_prolongation.nouvelle_echeance,
+                'cdd_opinion': entity.demande_prolongation.avis_cdd,
+                'justification_letter': entity.demande_prolongation.lettre_justification,
+                'brief_justification': entity.demande_prolongation.justification_succincte,
+            }
+            if entity.demande_prolongation
+            else {}
+        )
 
-    ConfirmationPaper.objects.update_or_create(
-        uuid=entity.entity_id.uuid,
-        defaults={
-            'admission': related_admission,
-            'confirmation_date': entity.date,
-            'confirmation_deadline': entity.date_limite,
-            'research_report': entity.rapport_recherche,
-            'supervisor_panel_report': entity.proces_verbal_ca,
-            'supervisor_panel_report_canvas': entity.canevas_proces_verbal_ca,
-            'research_mandate_renewal_opinion': entity.avis_renouvellement_mandat_recherche,
-            'certificate_of_failure': entity.attestation_echec,
-            'certificate_of_achievement': entity.attestation_reussite,
-            **extended_deadline_params,
-        },
-    )
+        ConfirmationPaper.objects.update_or_create(
+            uuid=entity.entity_id.uuid,
+            defaults={
+                'admission': related_admission,
+                'confirmation_date': entity.date,
+                'confirmation_deadline': entity.date_limite,
+                'research_report': entity.rapport_recherche,
+                'supervisor_panel_report': entity.proces_verbal_ca,
+                'supervisor_panel_report_canvas': entity.canevas_proces_verbal_ca,
+                'research_mandate_renewal_opinion': entity.avis_renouvellement_mandat_recherche,
+                'certificate_of_failure': entity.attestation_echec,
+                'certificate_of_achievement': entity.attestation_reussite,
+                **extended_deadline_params,
+            },
+        )
 
-    return entity.entity_id
+        return entity.entity_id
 ```
 
 ---
@@ -673,31 +692,31 @@ def save(cls, entity: 'EpreuveConfirmation') -> 'EpreuveConfirmationIdentity':
 ```python [|2|3-9|]
 @attr.dataclass(frozen=True, slots=True)
 class CompleterEpreuveConfirmationParPromoteurCommand(interface.CommandRequest):
-uuid: str
+    uuid: str
 
-proces_verbal_ca: List[str]
-avis_renouvellement_mandat_recherche: List[str]
+    proces_verbal_ca: List[str]
+    avis_renouvellement_mandat_recherche: List[str]
 ```
 
 ```python [|2|3|5-7|9-13|15-18]
 def completer_epreuve_confirmation_par_promoteur(
-cmd: 'CompleterEpreuveConfirmationParPromoteurCommand',
-epreuve_confirmation_repository: 'IEpreuveConfirmationRepository',
+    cmd: 'CompleterEpreuveConfirmationParPromoteurCommand',
+    epreuve_confirmation_repository: 'IEpreuveConfirmationRepository',
 ) -> DoctoratIdentity:
-# GIVEN
-epreuve_confirmation_id = EpreuveConfirmationIdentityBuilder.build_from_uuid(cmd.uuid)
-epreuve_confirmation = epreuve_confirmation_repository.get(epreuve_confirmation_id)
+    # GIVEN
+    epreuve_confirmation_id = EpreuveConfirmationIdentityBuilder.build_from_uuid(cmd.uuid)
+    epreuve_confirmation = epreuve_confirmation_repository.get(epreuve_confirmation_id)
 
-# WHEN
-epreuve_confirmation.completer_par_promoteur(
-    proces_verbal_ca=cmd.proces_verbal_ca,
-    avis_renouvellement_mandat_recherche=cmd.avis_renouvellement_mandat_recherche,
-)
+    # WHEN
+    epreuve_confirmation.completer_par_promoteur(
+        proces_verbal_ca=cmd.proces_verbal_ca,
+        avis_renouvellement_mandat_recherche=cmd.avis_renouvellement_mandat_recherche,
+    )
 
-# THEN
-epreuve_confirmation_repository.save(epreuve_confirmation)
+    # THEN
+    epreuve_confirmation_repository.save(epreuve_confirmation)
 
-return epreuve_confirmation.doctorat_id
+    return epreuve_confirmation.doctorat_id
 ```
 
 Notes:
@@ -719,18 +738,18 @@ A classic message bus with `invoke()` and `invoke_multiple()` methods with depen
 
 ```python
 class MessageBusCommands(AbstractMessageBusCommands):
-command_handlers: {
-  RecupererEpreuvesConfirmationQuery: partial(
-      recuperer_epreuves_confirmation,
-      epreuve_confirmation_repository=EpreuveConfirmationRepository(),
-      doctorat_repository=DoctoratRepository(),
-  ),
-  CompleterEpreuveConfirmationParPromoteurCommand: partial(
-      completer_epreuve_confirmation_par_promoteur,
-      epreuve_confirmation_repository=EpreuveConfirmationRepository(),
-  ),
-  ...
-}
+	command_handlers: {
+	    RecupererEpreuvesConfirmationQuery: partial(
+	        recuperer_epreuves_confirmation,
+	        epreuve_confirmation_repository=EpreuveConfirmationRepository(),
+	        doctorat_repository=DoctoratRepository(),
+	    ),
+	    CompleterEpreuveConfirmationParPromoteurCommand: partial(
+	        completer_epreuve_confirmation_par_promoteur,
+	        epreuve_confirmation_repository=EpreuveConfirmationRepository(),
+	    ),
+	    ...
+	}
 
 ```
 
@@ -741,49 +760,45 @@ command_handlers: {
 
 ```python [|10-12|14-19|7,21]
 class SupervisedConfirmationAPIView(APIPermissionRequiredMixin, mixins.UpdateModelMixin, GenericAPIView):
-name = "supervised_confirmation"
-schema = PromoterConfirmationSchema()
+    name = "supervised_confirmation"
+    schema = PromoterConfirmationSchema()
 
-def put(self, request, *args, **kwargs):
-    """Complete the confirmation paper related to a doctorate"""
-    serializer = serializers.CompleteConfirmationPaperByPromoterCommandSerializer(data=request.data)
-    serializer.is_valid(raise_exception=True)
+    def put(self, request, *args, **kwargs):
+        """Complete the confirmation paper related to a doctorate"""
+        serializer = serializers.CompleteConfirmationPaperByPromoterCommandSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-    last_confirmation_paper = message_bus_instance.invoke(
-        RecupererDerniereEpreuveConfirmationQuery(doctorat_uuid=kwargs.get('uuid')),
-    )
-
-    result = message_bus_instance.invoke(
-        CompleterEpreuveConfirmationParPromoteurCommand(
-            uuid=last_confirmation_paper.uuid,
-            **serializer.validated_data,
+        last_confirmation_paper = message_bus_instance.invoke(
+            RecupererDerniereEpreuveConfirmationQuery(doctorat_uuid=kwargs.get('uuid')),
         )
-    )
 
-    serializer = serializers.DoctorateIdentityDTOSerializer(instance=result)
+        result = message_bus_instance.invoke(
+            CompleterEpreuveConfirmationParPromoteurCommand(
+                uuid=last_confirmation_paper.uuid,
+                **serializer.validated_data,
+            )
+        )
 
-    return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer = serializers.DoctorateIdentityDTOSerializer(instance=result)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 ```
 
 NB: Command/Query and DTO dataclasses can be easily converted to serializers
-
----
-<!-- .slide: class="alternate" -->
-
-# Our take
 
 ---
 
 ## Pros
 - Technical complexity is concentrated in the `ddd` directory, with classic python
 - DRY
-- a use case could be re-used in multiple places in the UI
-- business validators too
-- optimize queries in the repository, model proxy and manage still have sense
+	- a use case could be re-used in multiple places in the UI
+	- business validators too
+	- optimize queries in the repository, model proxy and managers still have sense
 - Premature optimization is avoided
 - Your code is well-structured, easily readable (even by a non-technical person)
 - Typing and type checking (F*** yeah!)
 - Easier maintenance
+- Decoupling business from the framework, you know, if one day you stop loving Django...
 
 ---
 
@@ -792,11 +807,12 @@ NB: Command/Query and DTO dataclasses can be easily converted to serializers
 - Auto-scaffolding is out (or you must rework it)
 - Some queries (especially across multiple aggregate/domains) become complex
 - ORM is a bit trickier to optimize
+- No support for transactions, could be added, but tricky
 - It takes more time, so more money
 
 ---
 
-### That talk was a load of crap? You want the exact opposite ?
+### That talk was a load of crap ? You want the exact opposite ?
 
 Have a look at the session "**Data-Oriented Django**", by Adam Johnson, just after the keynote (3pm)
 
@@ -807,7 +823,7 @@ Have a look at the session "**Data-Oriented Django**", by Adam Johnson, just aft
 ## Questions?
 
 If not here, tweet me @SebCorbin
-        </textarea>
+        </script>
     </section>
   </div>
 </div>
