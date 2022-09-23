@@ -96,6 +96,57 @@
 
 ---
 
+## Who am I?
+
+> Sébastien Corbin (@SebCorbin)
+
+- been doing Python/Django since 2016
+- full-stack, previously PHP/Drupal, 10-year XP in web dev
+- local meetup co-organizer, tutor
+
+Notes:
+- it's my first DjangoCon
+- my english is a bit rusty, so I hope my slides are pretty enough
+
+---
+
+## Who I work for?
+
+> Makina Corpus <https://makina-corpus.com/>
+
+- small-sized agency (~50 persons) in Toulouse and Nantes, France
+- Python (web business apps, GIS, data science & AI)
+- PHP (web business apps)
+- Front-end
+- mostly open-source <!-- .element: class="fragment" -->
+    - [django-leaflet](https://github.com/makinacorpus/django-leaflet)
+    - [django-geojson](https://github.com/makinacorpus/django-geojson)
+    - [django-safedelete](https://github.com/makinacorpus/django-safedelete)
+    - [django-jsignature](https://github.com/fle/django-jsignature)
+
+Notes:
+
+---
+
+## Some of our products
+
+<div style="flex: auto" class="r-stretch">
+  <div>
+    <img style="max-width: 50%" src="https://geotrek.fr/assets/img/logo-home.svg">
+    <p>A trail and natural park managing tool</p>
+  </div>
+
+  <div>
+    <img style="max-width: 50%" src="https://github.com/locokit/locokit/raw/master/front/public/themes/locokit/img/logo-dark.png">
+    <p>A low code platform (DB as a spreadsheet)</p>
+  </div>
+</div>
+
+Notes:
+
+
+---
+
 ## Outline
 
 1. The OSIS project
@@ -108,32 +159,13 @@ Notes:
 - Code will be shown
 - I hope to have some time for the questions (25mn max)
 
----
-
-## Who am I?
-
-> Sébastien Corbin (@SebCorbin)
-
-- been doing Python/Django since 2016
-- full-stack, previously PHP/Drupal, 10-year XP in web dev
-- local meetup co-organizer, tutor
-
----
-
-## Who I work for?
-
-> Makina Corpus <https://makina-corpus.com/>
-
-- small-sized agency (~50 persons) in Toulouse and Nantes, France
-- Python (web business apps, GIS, data science & AI)
-- PHP (web business apps)
-- Front-end
-- all open-source
 
 ---
 <!-- .slide: class="alternate"  data-background-image="djangocon_white.jpg" data-background-opacity="1" -->
 
 # The OSIS project
+
+Notes:
 
 ---
 
@@ -144,7 +176,11 @@ Notes:
 > <https://github.com/uclouvain>
 
 Notes:
-It's "almost" open-source, main project has recently been taken out of public
+It's "almost" open-source, main project has recently been taken out of public visibility
+I hope it will rolled back, but you can find the code I will be showing the osis-admission subproject
+
+A few developers of the OSIS team (meaning our client) are in the room, so if I say bad things I may lose my job.
+Just kidding, we've been working together for few years now, and it's a joy
 
 ---
 
@@ -160,6 +196,12 @@ It's "almost" open-source, main project has recently been taken out of public
 - ...
 
 *We* were in charge of implementing partnerships, and recently remaking the student admission system
+
+Notes:
+
+partnership 3 years ago
+
+As you can see, it's a lot of stuff, so a lot of code to maintain
 
 ---
 
@@ -190,15 +232,21 @@ On the Django side:
 
 
 Notes:
+thrity five K students, six thousands staff members
 - 2 servers, 2 Django
 - the backoffice is only accessible through a VPN, for security reasons
 - the public facing portal communicates through an API generated with openapi generator
-- only stores basic data in database, historic decision, could be replaced by a framework-based frontend later
+- FO only stores basic data in database
+- it is an historic decision, could be replaced by a framework-based frontend later
+- it's a big monolithic app, but they are continuously trying to make it better
 
 ---
 <!-- .slide: class="alternate"  data-background-image="djangocon_white.jpg" data-background-opacity="1" -->
 
 # What is DDD, why and when?
+
+Notes:
+ok, so this was the introduction on the beast we were fighting against, now about DDD?
 
 ---
 
@@ -212,37 +260,49 @@ It's an approach for conception, not a software recipe, nor a framework.
 It's language-agnostic.
 Theorized by Eric Evans.
 
+Notes:
+- Who here has heard about DDD ?
+- Who uses it everyday ?
+
 ---
 
 ## Business domain at the center
 
-- As you're not the expert, you must speak the **same language** as domain's experts, have the same terms.
-- If needed (because sometimes they're speaking a weird language), a **glossary** can be created
-- Your code must reflect these terms
-- If your domain is expressed in French, yes, your DDD code should be in French
-
-![https://media.giphy.com/media/m9oruywyYbHL6A2wWp/giphy.gif](https://media.giphy.com/media/m9oruywyYbHL6A2wWp/giphy.gif)
+- As you're not the expert, you must speak the same language as domain's experts, have the same terms.
+- If needed (because sometimes they're speaking a weird language), a glossary can be created <!-- .element: class="fragment" -->
+- Your code must reflect these terms <!-- .element: class="fragment" -->
+- If your domain is expressed in French, then yes,
+  your DDD code should be in French <!-- .element: class="fragment" -->
+  ![https://media.giphy.com/media/m9oruywyYbHL6A2wWp/giphy.gif](https://media.giphy.com/media/m9oruywyYbHL6A2wWp/giphy.gif)
 
 Notes:
-So I'll be showing some code that is in French (which I will translate as much as I can) but the important part is the approach, and every domain is different
+- So I'll be showing some code that is in French (which I will translate as much as I can)
+but the important part is the approach, and every domain is different obviously you may not care about students.
+- You may be seeing both french and english, as we french people like to call it "frenglish"
+- Who here is French ?
 
 ---
 
-## But why so much pain?
+## Domain? Why? What about data?
 
 > Django is a model-driven (or data-driven ?) framework !
 
-- Yes, but for **complex processes**, the code can look like spaghetti
-- When your model changes, you **risk an alteration** of the process
-- Sometimes you code things **you don't understand** (and you're translating it wrong)
-- A model-driven architecture represent a developer's **way of thinking**, and teams can change over time
-- **Code structure** represents the domain, it "could" almost be read by non-technical staff
-- Highly testable (you know, unit testing **and** functional testing)
-- Highly maintainable
+- Yes, but for complex processes, the code can look like spaghetti <!-- .element: class="fragment" -->
+- When your model changes, you risk an alteration of the process <!-- .element: class="fragment" -->
+- Sometimes you code things you don't understand (and you're translating it wrong) <!-- .element: class="fragment" -->
+- A model-driven architecture represents a developer's way of thinking, and teams can change over time <!-- .element: class="fragment" -->
+
+Notes:
+Humans change, you know, and this talk is more about humanity and how to handle people more than about programming
 
 ---
 
 ![](how_customer_explained_it.webp)
+
+Notes:
+
+So you may have seen this from time to time, this image basically represents the communication between people
+around a project, and the lifecycle of a project
 
 ---
 
@@ -254,16 +314,20 @@ So I'll be showing some code that is in French (which I will translate as much a
 
 ![](https://media.giphy.com/media/YJjvTqoRFgZaM/giphy.gif)
 
+Notes:
+
 ---
 
 ## When _not_ to use DDD?
 
-- App is a simple **CRUD**
-- Business is already answered by **third-party** (CMS, e-commerce, etc.)
-- No maintenance needed over time, no evolution
-- App is "too simple" or no complex business
-- Short time-to-market or Proof-of-Concept
-- Your dev team is too junior
+- App is a simple CRUD
+- Business is already answered by third-party (CMS, e-commerce, etc.) <!-- .element: class="fragment" -->
+- No maintenance needed over time, no evolution <!-- .element: class="fragment" -->
+- App is "too simple" or no complex business <!-- .element: class="fragment" -->
+- Short time-to-market or Proof-of-Concept <!-- .element: class="fragment" -->
+- Your dev team is too junior <!-- .element: class="fragment" -->
+
+Notes:
 
 ---
 
@@ -276,11 +340,15 @@ Yes
 
 > DDD has been introduced in OSIS 5 years after the first release
 
+Notes:
+
 ---
 
 <!-- .slide: class="alternate"  data-background-image="djangocon_white.jpg" data-background-opacity="1" -->
 
 # Common patterns
+
+Notes:
 
 ---
 
@@ -288,10 +356,15 @@ Yes
 
 <img class="r-stretch" src="ubiquitous-language.webp">
 
-- Use the right terms across your domain
-- Define them at the **beginning**, they must come from the business but they can be discussed
-- Once stated, if needed, create a **glossary** to explain their meaning
-- A term can have **another meaning in another context**
+- Use the right terms across your domain <!-- .element: class="fragment" -->
+- Define them at the beginning, they must come from the business but they can be discussed <!-- .element: class="fragment" -->
+- A term can have another meaning in another context <!-- .element: class="fragment" -->
+- Once stated, if needed, create a glossary to explain their meaning <!-- .element: class="fragment" -->
+
+Notes:
+- Ubiquitous means "everywhere", omnipresent, and that means it's one the most important things to take care of.
+because if people don't understand each other, have the same language/terms, this will be failing fast.
+- As for the code, a glossary could live in a docstring of a package's dunder init
 
 ---
 
@@ -299,15 +372,17 @@ Yes
 
 > Separate your business into small parts, each one solving a problem.
 
-- means that an object can have **different name in different contexts**
-- User is a *customer* in the *commerce* domain
-- User is an *account* in the *invoicing* domain
-- User is a *recipient* in the *shipping* domain
-- in the code, bounds usually means namespace
-- does not mean contexts cannot communicate, but data **must be translated** between
-- data exposure can depend on context (even if close in storage)
-- payment mode is only needed in *invoice* domain
-- address could be different in *invoice* and *shipping* domains
+- means that an object can have different name in different contexts <!-- .element: class="fragment" -->
+  - User is a *customer* in the *commerce* domain
+  - User is an *account* in the *invoicing* domain
+  - User is a *recipient* in the *shipping* domain
+- in the code, bounds usually means namespace <!-- .element: class="fragment" -->
+- does not mean contexts cannot communicate, but data may have to be translated between <!-- .element: class="fragment" -->
+- data exposure can depend on context (even if close in storage) <!-- .element: class="fragment" -->
+  - payment mode is only needed in *invoice* domain
+  - address could be different in *invoice* and *shipping* domains
+
+Notes:
 
 ---
 
@@ -319,6 +394,8 @@ Yes
 - Beware of it inflating if you put too much in it!
 
 *Common examples : user info, addresses, notifications*
+
+Notes:
 
 ---
 
@@ -339,6 +416,8 @@ Yes
                             └──────────────────────────┘
 ```
 This is OSIS' take, some DDD architectures use *hexagonal* or *clean* architecture
+
+Notes:
 
 ---
 
@@ -458,6 +537,7 @@ Notes:
 9. In the infrastructure, we map the same directory structure
 10. only we add in-memory and django implementations for each context
 11. as you can see some domain services could also need different implementations
+12. and aside from these you have a real django app, with views, models, urls, et caetera
 
 ---
 
@@ -467,12 +547,14 @@ Notes:
 
 ## Vocabulary
 
-- **Use case** : some action, a query (read) or command (write) made by someone
-- **Aggregate** : a root entity, entry point to manipulate data, masking other domain entities
-- **Repository** : your way to the data, loading or saving aggregates, or fetching DTO
-- **DTO** : Data-Transfer-Object, a dumb data class used to I/O from context
-- **Domain service** : useful when dealing with multiple or complex things
-- **Validator** : prevents manipulating a wrong state in your domain
+- Use case : some action, responding to a query (read) or command (write) made by someone <!-- .element: class="fragment" -->
+- Aggregate : a root domain model entity, entry point to manipulate data, masking other domain entities <!-- .element: class="fragment" -->
+- Repository : your way to the data, loading or saving aggregates, or fetching DTO <!-- .element: class="fragment" -->
+- DTO : Data-Transfer-Object, a dumb data class used to I/O from context <!-- .element: class="fragment" -->
+- Domain service : useful when dealing with multiple or complex things <!-- .element: class="fragment" -->
+- Validator : prevents manipulating a wrong state in your domain <!-- .element: class="fragment" -->
+
+Notes:
 
 ---
 
@@ -487,6 +569,8 @@ Get everyone in the business around a table to state on what should the applicat
 
 <img class="r-stretch" src="https://callistaenterprise.se/assets/blogg/event-storming.png">
 
+Notes:
+
 ---
 
 **Event modeling**
@@ -496,22 +580,27 @@ Refine previous work, adding concepts of user interface and actors
 
 <img class="r-stretch" src="event_modeling.png">
 
+Notes:
+
 ---
 <!-- .slide: class="alternate"  data-background-image="djangocon_white.jpg" data-background-opacity="1" -->
 
-
 # Our take
+
+Notes:
 
 ---
 
 ## A brief comment on Python
 
-- Use python 3.7+ for **dataclasses**
+- Use at least python 3.7 for **dataclasses**
 - `attrs` is a nice library for default attribute factories, frozen and slotted classes
-- **Using typing** make it easier, `mypy` (with `django-stubs`) is your friend after that
-- **Avoid using any of Django** in `ddd` directory (apart maybe gettext_lazy and timezone)
+- **Using typing** makes it easier, `mypy` (with `django-stubs`) is your friend after that
+- **Avoid using any of Django** in `ddd` directory (apart maybe `gettext_lazy` and `timezone`)
 
-**Now some code !**
+#### Now some code !
+
+Notes:
 
 ---
 
@@ -523,6 +612,8 @@ Refine previous work, adding concepts of user interface and actors
 - that may contain complex data (through ValueObjects)
 - some behavior can ensure its **state is valid** before modifying it
 - it can be loaded and saved **through a repository**
+
+Notes:
 
 ---
 
@@ -568,19 +659,30 @@ class EpreuveConfirmation(interface.RootEntity):
     ):
         self.proces_verbal_ca = proces_verbal_ca
         self.avis_renouvellement_mandat_recherche = avis_renouvellement_mandat_recherche
-
 ```
+
+Notes:
+- EpreuveConfirmation means confirmation exam
+- identity
+- state (with ValueObject demande_prolongation which means an extension request)
+- behavior (asking for a extension request means simply a new ValueObject)
+- validation
+
 ---
 
 ## An example of repository
 
-- Based on an **interface**, hence swappable, can have an in-memory version for unit tests, or even a SQLAlchemy version to drop Django ORM
+- Based on a **declared interface**, hence swappable:
+    - can have an in-memory version for unit tests
+    - or even a SQLAlchemy version to drop Django's ORM 😱
 - It should have 3 default methods : `get`, `save` (update or create), and `delete`, but can have other methods (search, get_by_X)
 - Can return an aggregate (or a collection of) or DTOs
 
+Notes:
+
 ---
 
-```python [|4|19|28]
+```python [|4|14|19|28]
 class IEpreuveConfirmationRepository(interface.AbstractRepository):
     @classmethod
     @abc.abstractmethod
@@ -612,23 +714,23 @@ class IEpreuveConfirmationRepository(interface.AbstractRepository):
         pass
 ```
 
-
 Notes:
 
-no booing please :)
+- get, save, search, and delete
+- you might say we are reinventing the wheel, but it has some advantages
 
 ---
 
 ### The Django implementation
 
-Mapping your model(s) to the aggregate and ValueObject
-
-```python [|5,9-24|43-57]
+```python [|5-7,11-26|45-59]
 class EpreuveConfirmationRepository(IEpreuveConfirmationRepository):
     @classmethod
     def get(cls, entity_id: 'EpreuveConfirmationIdentity') -> 'EpreuveConfirmation':
         try:
-            confirmation_paper = ConfirmationPaper.objects.select_related('admission').get(uuid=entity_id.uuid)
+            confirmation_paper = ConfirmationPaper.objects.select_related('admission').get(
+                uuid=entity_id.uuid
+            )
         except ConfirmationPaper.DoesNotExist:
             raise EpreuveConfirmationNonTrouveeException
 
@@ -685,6 +787,12 @@ class EpreuveConfirmationRepository(IEpreuveConfirmationRepository):
         return entity.entity_id
 ```
 
+Notes:
+
+- here we are mapping the django model(s) to the aggregate and ValueObject
+- get means getting and loading an object
+- save means update_or_create based on primary key
+
 ---
 
 ## An example of a use case
@@ -728,12 +836,11 @@ Notes:
 5. we save that to our repository
 
 
-
 ---
 
 ## Mapping use cases in the message bus
 
-A classic message bus with `invoke()` and `invoke_multiple()` methods with dependency injection
+A classic message bus with `invoke()` and `invoke_multiple()` methods with dependency injection and
 2 versions: a Django implementation and an in-memory for unit testing
 
 ```python
@@ -752,6 +859,12 @@ class MessageBusCommands(AbstractMessageBusCommands):
 	}
 
 ```
+
+Notes:
+
+- So now we have to bind our use cases to the repository
+- for that we use a message bus, which a big mapping instance global to the whole project
+- and you can have one for Django, and one for unit tests
 
 ---
 
@@ -784,37 +897,47 @@ class SupervisedConfirmationAPIView(APIPermissionRequiredMixin, mixins.UpdateMod
         return Response(serializer.data, status=status.HTTP_200_OK)
 ```
 
-NB: Command/Query and DTO dataclasses can be easily converted to serializers
+Command/Query and DTO dataclasses are easily converted to serializers
+
+Notes:
 
 ---
 
 ## Pros
-- Technical complexity is concentrated in the `ddd` directory, with classic python
-- DRY
+- Technical "complexity" is concentrated in the ddd directory, with classic python <!-- .element: class="fragment" -->
+- DRY <!-- .element: class="fragment" -->
 	- a use case could be re-used in multiple places in the UI
 	- business validators too
-	- optimize queries in the repository, model proxy and managers still have sense
-- Premature optimization is avoided
-- Your code is well-structured, easily readable (even by a non-technical person)
-- Typing and type checking (F*** yeah!)
-- Easier maintenance
-- Decoupling business from the framework, you know, if one day you stop loving Django...
+	- optimize queries in the repository, model proxy and managers still have value
+- Premature optimization is avoided <!-- .element: class="fragment" -->
+- Your code is well-structured, easily readable (even by a non-technical person) <!-- .element: class="fragment" -->
+- Typing and type checking (F*** yeah!) <!-- .element: class="fragment" -->
+- Easier maintenance <!-- .element: class="fragment" -->
+- Decoupling business from the framework, you know, if one day you stop loving Django... <!-- .element: class="fragment" -->
+
+Notes:
 
 ---
 
 ## Cons
-- You lose the sugar (Rapid Application Development) of Django
-- Auto-scaffolding is out (or you must rework it)
-- Some queries (especially across multiple aggregate/domains) become complex
-- ORM is a bit trickier to optimize
-- No support for transactions, could be added, but tricky
-- It takes more time, so more money
+- You lose the sugar (Rapid Application Development) of Django <!-- .element: class="fragment" -->
+- Auto-scaffolding is out (or you must rework it) <!-- .element: class="fragment" -->
+- Some queries (especially across multiple aggregate/domains) become complex <!-- .element: class="fragment" -->
+- ORM is a bit trickier to optimize <!-- .element: class="fragment" -->
+- No support for transactions, could be added, but tricky <!-- .element: class="fragment" -->
+- It takes more time, so more money <!-- .element: class="fragment" -->
+
+Notes:
 
 ---
 
 ### That talk was a load of crap ? You want the exact opposite ?
 
+![](https://media.giphy.com/media/Oc7Wl9OKlB3iM/giphy.gif)
+
 Have a look at the session "**Data-Oriented Django**", by Adam Johnson, just after the keynote (3pm)
+
+Notes:
 
 ---
 

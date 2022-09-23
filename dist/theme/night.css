@@ -198,7 +198,7 @@ section.has-light-background, section.has-light-background h1, section.has-light
   display: block;
   padding: 5px;
   overflow: auto;
-  max-height: 500px;
+  max-height: 80vh;
   word-wrap: normal;
 }
 
