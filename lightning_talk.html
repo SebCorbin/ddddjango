@@ -1,0 +1,516 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <title>You might not need slippers</title>
+
+  <link rel="stylesheet" href="dist/reset.css">
+  <link rel="stylesheet" href="dist/reveal.css">
+  <style>
+    /*********************************************
+     * GLOBAL STYLES
+     *********************************************/
+    :root {
+      --r-background-color: #111;
+      --r-main-font: Open Sans, sans-serif;
+      --r-main-font-size: 28px;
+      --r-main-color: #eee;
+      --r-block-margin: 20px;
+      --r-heading-margin: 20px 0;
+      --r-heading-font: Montserrat, Impact, sans-serif;
+      --r-heading-color: #eee;
+      --r-heading-line-height: 1.2;
+      --r-heading-letter-spacing: -0.03em;
+      --r-heading-text-transform: none;
+      --r-heading-text-shadow: none;
+      --r-heading-font-weight: normal;
+      --r-heading1-text-shadow: none;
+      --r-heading1-size: 3.77em;
+      --r-heading2-size: 2.11em;
+      --r-heading3-size: 1.55em;
+      --r-heading4-size: 1em;
+      --r-code-font: monospace;
+      --r-link-color: #e7ad52;
+      --r-link-color-dark: #d08a1d;
+      --r-link-color-hover: #f3d7ac;
+      --r-selection-background-color: #e7ad52;
+      --r-selection-color: #fff;
+    }
+
+    .reveal ul img {
+      vertical-align: middle;
+    }
+
+    .reveal p > img {
+      margin: 0;
+    }
+
+    .reveal {
+      text-shadow: #000 0 0 .5em;
+    }
+  </style>
+  <link rel="stylesheet" href="dist/theme/night.css">
+  <style>
+    .reveal ol, .reveal dl, .reveal ul {
+      margin: var(--r-block-margin);
+    }
+    .reveal ol ol, .reveal dl dl, .reveal ul ul {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+
+    .reveal p + ul {
+      margin-top: 0;
+    }
+
+    .reveal pre code {
+        max-height: 70vh;
+    }
+    .reveal .alternate h1,
+    .reveal .alternate h2,
+    .reveal .alternate h3,
+    .reveal .alternate h4,
+    .reveal .alternate h5,
+    .reveal .alternate h6 {
+      color: #033369;
+    }
+  </style>
+
+  <!-- Theme used for syntax highlighted code -->
+  <link rel="stylesheet" href="stackoverflow-dark.css">
+</head>
+<body>
+<div class="reveal">
+  <div class="slides">
+    <section
+      data-markdown
+      data-separator-notes="^Notes:"
+      data-background-image="homepage_xl.png"
+      data-background-opacity="0.8"
+    >
+  <script type="text/template">
+<!-- .slide: class="alternate"  data-background-image="djangocon_white.jpg" data-background-opacity="1" -->
+
+# You might not need slippers 🥿
+
+---
+
+## What you can do in Django templates
+
+You can have an inclusion tag to separate your HTML code
+
+```python [|2]
+# templatetags/your_tags.py
+@register.inclusion_tag('link.html')
+def jump_link(link, title):
+    return {
+        'link': link,
+        'title': title,
+   }
+```
+
+```html
+{# link.html #}
+Go to <a href="{{ link }}">{{ title }}</a>.
+```
+
+and then use it as
+
+``` [1|2]
+{% jump_link "https://makina-corpus.com" "Makina Corpus" %}
+{% jump_link "https://makina-corpus.com" '<span class="icon icon-goto">Makina Corpus</span>' %}
+```
+
+Notes:
+- very simple, you declare a functio, a template, an use it like that, until...
+- you need to inject HTML in that...
+
+---
+
+There is no simple way to declare a __wrapping tag__ that could have interpreted content.
+Imagine we want to have FAQ as a bootstrap accordion, each question would look like:
+
+```
+{# faq_question.html #}
+<div class="panel panel-default">
+  <div class="panel-heading" role="tab" id="question{{ faq_counter }}">
+    <h4 class="panel-title">
+      <a role="button" data-toggle="collapse" data-parent="#accordion"
+         href="#answer{{ faq_counter }}" aria-expanded="true"
+         aria-controls="answer{{ faq_counter }}">
+        {{ question }}
+      </a>
+    </h4>
+  </div>
+  <div id="answer{{ faq_counter }}" role="tabpanel"
+       class="panel-collapse collapse{% if active %} in{% endif %}"
+       aria-labelledby="question{{ faq_counter }}">
+    <div class="panel-body">
+      {{ answer }}
+    </div>
+  </div>
+</div>
+```
+
+`faq_counter` could be calculated, `question` can be a single sentence, but `answer` may have links, a list, etc.
+
+Notes:
+- no simple way to inject HTML in answer variable
+
+---
+
+```html [|4-11|13-20|22-31]
+<h3>Frequently asked questions</h3>
+<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+    {% if user.is_anonymous %}
+        {% faq "I've forgotten my password" active=True %}
+            <p>
+                If you have forgotten your account password, use
+                <a href="{% url 'account:password' %}">
+                    the password reset form
+                </a>.
+            </p>
+        {% endfaq %}
+    {% else %}
+        {% faq "I wish to change my password" %}
+            <p>
+                If you wish to choose your own password, log out and use
+                <a href="{% url 'account:password' %}">
+                    the password reset form
+                </a>
+            </p>
+        {% endfaq %}
+    {% endif %}
+    {% faq "What are the payment options?" %}
+        <p>
+            There are multiple ways to pay for our service:
+            <ul>
+                <li>Paypal</li>
+                <li>Credit card</li>
+                <li>Crypto</li>
+            </ul>
+        </p>
+    {% endfaq %}
+</div>
+```
+
+Notes:
+
+what if you could do that
+
+---
+
+## Slippers
+
+<https://mitchel.me/slippers/docs/getting-started/>
+
+```
+{# myapp/templates/myapp/card.html #}
+<div class="card">
+  <h1 class="card__header">{{ heading }}</h1>
+  <div class="card__body">
+    {{ children }}
+  </div>
+</div>
+```
+
+```yaml
+components:
+  card: "myapp/card.html"
+```
+
+```html
+{% load slippers %}
+
+{% #card heading="I am the heading" %}
+  <span>Hello {{ name|title }}!</span>
+{% /card %}
+```
+
+Notes:
+- a solution for this is a library called slipper which Thibault Colas mentioned in his talk about "Component UI" yesterday
+- But let's say you don't like YAML, or you don't want another dependency
+
+---
+
+## A custom template Node
+
+`@register.inclusion_tag()` relies on `template.library.InclusionNode` and we want **inclusion** and **interpretation**, so let's work from `InclusionNode` and add the interpretation to it.
+
+When Django template parses a template, it extracts a nodelist. Let's add nodelist and context_object_name parameters to our new class:
+
+```python [|2,4-5,8]
+class InclusionWithBodyNode(template.library.InclusionNode):
+    def __init__(self, nodelist, context_object_name, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.nodelist = nodelist
+        self.context_object_name = context_object_name
+
+    def render(self, context):
+        context[self.context_object_name] = self.nodelist.render(context)
+        return super().render(context)
+```
+
+Notes:
+So we're going deep inside the django template logic and create our own
+
+
+---
+
+## A registration decorator
+
+```python [|2-4|5]
+def register_inclusion_with_body(
+    filename,
+    takes_context=None,
+    name=None,
+    context_object_name="body",
+):
+    def dec(func):
+        params, varargs, varkw, defaults, kwonly, kwonly_defaults, _ = getfullargspec(func)
+        function_name = name or getattr(func, "_decorated_function", func).__name__
+
+        @functools.wraps(func)
+        def compile_func(parser, token):
+            bits = token.split_contents()[1:]
+            args, kwargs = template.library.parse_bits(
+                parser,
+                bits,
+                params,
+                varargs,
+                varkw,
+                defaults,
+                kwonly,
+                kwonly_defaults,
+                takes_context,
+                function_name,
+            )
+            nodelist = parser.parse((f"end{function_name}",))
+            parser.delete_first_token()
+            return InclusionWithBodyNode(
+                nodelist,
+                func,
+                takes_context,
+                args,
+                kwargs,
+                filename,
+                context_object_name,
+            )
+
+        register.tag(function_name, compile_func)
+        return func
+
+    return dec
+```
+
+Notes:
+- classic parameters to inclusion tag
+- our new context_object_name
+
+---
+
+```python [|1-3|4]
+@register_inclusion_with_body(
+    'faq_question.html', takes_context=True, context_object_name='answer',
+)
+def faq(context, question, active=False):
+    """
+    Template tag for faq question
+    :param question: the question title
+    :param active: If the question should be un-collapsed by default
+    :type context: django.template.context.RequestContext
+    """
+    context.setdefault('faq_counter', 0)
+    context['faq_counter'] += 1
+    context['active'] = active
+    context['question'] = question
+    return context
+```
+
+---
+
+```python [8|9|11-36|38]
+def register_inclusion_with_body(
+    filename,
+    takes_context=None,
+    name=None,
+    context_object_name="body",
+):
+    def dec(func):
+        params, varargs, varkw, defaults, kwonly, kwonly_defaults, _ = getfullargspec(func)
+        function_name = name or getattr(func, "_decorated_function", func).__name__
+
+        @functools.wraps(func)
+        def compile_func(parser, token):
+            bits = token.split_contents()[1:]
+            args, kwargs = template.library.parse_bits(
+                parser,
+                bits,
+                params,
+                varargs,
+                varkw,
+                defaults,
+                kwonly,
+                kwonly_defaults,
+                takes_context,
+                function_name,
+            )
+            nodelist = parser.parse((f"end{function_name}",))
+            parser.delete_first_token()
+            return InclusionWithBodyNode(
+                nodelist,
+                func,
+                takes_context,
+                args,
+                kwargs,
+                filename,
+                context_object_name,
+            )
+
+        register.tag(function_name, compile_func)
+        return func
+
+    return dec
+```
+
+Notes:
+- this analyses the parameters of the decorated function
+- this takes the name of the decorated function in case we did not give a name
+- we have a parsing/compilation business (I'll get back on that just after)
+- and this function is finally registered in the template library
+
+---
+
+```html [|1|2-7|8]
+{% faq "I've forgotten my password" active=True %}
+    <p>
+        If you have forgotten your account password, use
+        <a href="{% url 'account:password' %}">
+            the password reset form
+        </a>.
+    </p>
+{% endfaq %}
+```
+
+Notes:
+- let's get back to what we want to have at the end
+- we will to parse the stating tag line to get parameters
+- we will to parse and interpret the content
+- until the end tag
+
+
+---
+
+```python [13|14-25|26|27|28-36]
+def register_inclusion_with_body(
+    filename,
+    takes_context=None,
+    name=None,
+    context_object_name="body",
+):
+    def dec(func):
+        params, varargs, varkw, defaults, kwonly, kwonly_defaults, _ = getfullargspec(func)
+        function_name = name or getattr(func, "_decorated_function", func).__name__
+
+        @functools.wraps(func)
+        def compile_func(parser, token):
+            bits = token.split_contents()[1:]
+            args, kwargs = template.library.parse_bits(
+                parser,
+                bits,
+                params,
+                varargs,
+                varkw,
+                defaults,
+                kwonly,
+                kwonly_defaults,
+                takes_context,
+                function_name,
+            )
+            nodelist = parser.parse((f"end{function_name}",))
+            parser.delete_first_token()
+            return InclusionWithBodyNode(
+                nodelist,
+                func,
+                takes_context,
+                args,
+                kwargs,
+                filename,
+                context_object_name,
+            )
+
+        register.tag(function_name, compile_func)
+        return func
+
+    return dec
+```
+
+Notes:
+- ok, for the parsing/compilation part, this takes the content IN the tag (except the tag_name)
+- this code analyse the parameters (after the FAQ tag name), and maps them to the one we have in the decorated function
+- this constructs the nodelist of all the "body" content until the "endX" tag
+- and excludes the first token (which is the starting tag)
+- and finally instantiates the node we had earlier
+
+---
+
+# And that's it !
+
+Recap :
+- Declare a new kind of dj template `Node`
+- Declare a new decorator to instantiate that Node
+- Decorate your template tag function
+- Add the template
+
+![](https://media.giphy.com/media/Ij3TJHnhJjXEc/giphy.gif)
+
+---
+
+## Another use case
+
+You could have more complex tags, think of:
+
+```html [|1,3,6]
+{% panel "My panel title" color="info" %}
+  <p>My panel {{ content }}</p>
+{% footer %}
+  <a href="#" class="text-danger">Close</a>
+  <button class="btn btn-success">Submit</button>
+{% endpanel %}
+```
+
+[Node and decorator](https://github.com/uclouvain/osis-admission/blob/dev/templatetags/admission.py#L50),
+[registration](https://github.com/uclouvain/osis-admission/blob/dev/templatetags/admission.py#L135),
+[template](https://github.com/uclouvain/osis-admission/blob/dev/templates/panel.html)
+
+
+
+---
+
+# Thank you!
+
+Questions? tweet me @SebCorbin
+        </script>
+    </section>
+  </div>
+</div>
+
+<script src="dist/reveal.js"></script>
+<script src="plugin/notes/notes.js"></script>
+<script src="plugin/markdown/markdown.js"></script>
+<script src="plugin/highlight/highlight.js"></script>
+<script>
+// More info about initialization & config:
+// - https://revealjs.com/initialization/
+// - https://revealjs.com/config/
+Reveal.initialize({
+  hash: true,
+
+  // Learn about plugins: https://revealjs.com/plugins/
+  plugins: [RevealMarkdown, RevealHighlight, RevealNotes],
+});
+</script>
+</body>
+</html>
